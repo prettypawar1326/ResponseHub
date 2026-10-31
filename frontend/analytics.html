@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics | ResponseHub</title>
+<style>
+body{font-family:Arial;background:#f3f6fc;margin:0;color:#172554}
+header{background:#172554;color:white;padding:20px 8%;font-size:23px}
+.container{max-width:850px;margin:40px auto;padding:20px}
+.card{background:white;padding:25px;border-radius:12px;margin:20px 0;box-shadow:0 3px 12px #ddd}
+.number{font-size:40px;color:#2563eb;font-weight:bold}
+.bar{height:20px;background:#2563eb;border-radius:5px;margin-top:10px}
+a{color:#2563eb;text-decoration:none}
+</style>
+</head>
+<body>
+<header>ResponseHub</header>
+<div class="container">
+<h2>Analytics & Reports</h2>
+
+<div class="card">
+<h3>Total Responses</h3>
+<div class="number" id="total">0</div>
+<p>Responses collected so far</p>
+</div>
+
+<div class="card">
+<h3>Response Overview</h3>
+<p id="summary">No responses available yet.</p>
+<div class="bar" id="bar" style="width:0%"></div>
+</div>
+
+<div class="card">
+<h3>Form Information</h3>
+<p id="formName">Form: Not created</p>
+<p id="description">Description: Not available</p>
+</div>
+
+<a href="responses.html">View All Responses →</a>
+<br><br>
+<a href="index.html">← Back to Home</a>
+</div>
+
+async function loadAnalytics() {
+    const title = localStorage.getItem("formTitle") || "Not created";
+    const description = localStorage.getItem("formDescription") || "Not available";
+
+    document.getElementById("formName").textContent = "Form: " + title;
+    document.getElementById("description").textContent = "Description: " + description;
+
+    try {
+        const result = await fetch("/api/responses");
+
+        if (!result.ok) throw new Error("Unable to load");
+
+        let responses = await result.json();
+
+        responses = responses.map(r =>
+            typeof r === "string" ? JSON.parse(r) : r
+        );
+
+        document.getElementById("total").textContent = responses.length;
+
+        document.getElementById("summary").textContent =
+            responses.length + " response(s) have been collected.";
+
+        document.getElementById("bar").style.width =
+            Math.min(responses.length * 10, 100) + "%";
+
+    } catch (error) {
+        document.getElementById("summary").textContent =
+            "Unable to load analytics. Please check the backend.";
+    }
+}
+
+loadAnalytics();
+</body>
+</html>
