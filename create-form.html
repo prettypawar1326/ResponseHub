@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Form | ResponseHub</title>
+<style>
+body{font-family:Arial;background:#f3f6fc;margin:0;color:#172554}
+header{background:#172554;color:white;padding:20px 8%;font-size:23px}
+.container{max-width:600px;margin:50px auto;background:white;padding:30px;border-radius:12px;box-shadow:0 4px 15px #ddd}
+h2{margin-top:0}
+input,textarea{width:100%;padding:12px;margin:10px 0 20px;box-sizing:border-box;border:1px solid #ccc;border-radius:6px}
+button{background:#2563eb;color:white;border:0;padding:13px 22px;border-radius:6px;cursor:pointer}
+a{color:#2563eb;text-decoration:none}
+</style>
+</head>
+<body>
+<header>ResponseHub</header>
+<div class="container">
+<h2>Create Your Form</h2>
+<p>Enter details to create a new response form.</p>
+
+<label>Form Title</label>
+<input id="title" type="text" placeholder="Enter form title">
+
+<label>Description</label>
+<textarea id="description" placeholder="Enter form description"></textarea>
+
+<button onclick="createForm()">Create Form</button>
+<p id="message"></p>
+<br>
+<a href="index.html">← Back to Home</a>
+</div>
+
+<script>
+function createForm(){
+ const title=document.getElementById("title").value.trim();
+ const description=document.getElementById("description").value.trim();
+
+ if(!title){
+   alert("Please enter a form title");
+   return;
+ }
+
+ localStorage.setItem("formTitle",title);
+ localStorage.setItem("formDescription",description);
+
+ document.getElementById("message").innerText="Form created successfully!";
+ setTimeout(()=>window.location.href="fill-form.html",1000);
+}
+</script>
+</body>
+</html>

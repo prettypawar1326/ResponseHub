@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fill Form | ResponseHub</title>
+<style>
+body{font-family:Arial;background:#f3f6fc;margin:0;color:#172554}
+header{background:#172554;color:white;padding:20px 8%;font-size:23px}
+.container{max-width:600px;margin:40px auto;background:white;padding:30px;border-radius:12px}
+input,textarea{width:100%;padding:12px;margin:10px 0 20px;box-sizing:border-box;border:1px solid #ccc;border-radius:6px}
+button{background:#2563eb;color:white;border:0;padding:13px 22px;border-radius:6px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>ResponseHub</header>
+<div class="container">
+<h2 id="formTitle">Feedback Form</h2>
+<p id="formDescription"></p>
+
+<form id="responseForm">
+<label>Your Name</label>
+<input id="name" required placeholder="Enter your name">
+
+<label>Your Response</label>
+<textarea id="answer" required placeholder="Write your response"></textarea>
+
+<button type="submit">Submit Response</button>
+</form>
+</div>
+
+<script>
+document.getElementById("formTitle").textContent =
+localStorage.getItem("formTitle") || "Feedback Form";
+
+document.getElementById("formDescription").textContent =
+localStorage.getItem("formDescription") || "Please share your feedback.";
+
+document.getElementById("responseForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const response = {
+        name: document.getElementById("name").value,
+        answer: document.getElementById("answer").value,
+        date: new Date().toLocaleString()
+    };
+
+    try {
+        const result = await fetch("/api/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(response)
+        });
+
+        if (result.ok) {
+            window.location.href = "success.html";
+        } else {
+            alert("Response could not be saved. Please try again.");
+        }
+    } catch (error) {
+        alert("Backend connection failed. Please check whether the server is running.");
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responses Dashboard</title>
+<style>
+body{font-family:Arial;background:#f3f6fc;margin:0;color:#172554}
+header{background:#172554;color:white;padding:20px 8%;font-size:23px}
+.container{max-width:900px;margin:35px auto;padding:20px}
+.card{background:white;padding:20px;margin:15px 0;border-radius:10px;box-shadow:0 3px 10px #ddd}
+h2{color:#172554}
+a{color:#2563eb;text-decoration:none}
+button{background:#dc2626;color:white;border:0;padding:10px 16px;border-radius:6px;cursor:pointer}
+.response{border-bottom:1px solid #ddd;padding:15px 0}
+</style>
+</head>
+<body>
+<header>ResponseHub</header>
+<div class="container">
+<h2>Responses Dashboard</h2>
+<div class="card">
+<h3 id="formTitle">Form Responses</h3>
+<p>Total Responses: <strong id="total">0</strong></p>
+<button onclick="clearResponses()">Clear All Responses</button>
+<div id="responseList"></div>
+</div>
+<a href="index.html">← Back to Home</a>
+</div>
+
+<script>
+async function showResponses() {
+    const list = document.getElementById("responseList");
+
+    document.getElementById("formTitle").textContent =
+        localStorage.getItem("formTitle") || "Form Responses";
+
+    try {
+        const result = await fetch("/api/responses");
+
+        if (!result.ok) {
+            throw new Error("Could not load responses");
+        }
+
+        let responses = await result.json();
+
+        // Backend may return JSON objects or JSON strings.
+        responses = responses.map(r =>
+            typeof r === "string" ? JSON.parse(r) : r
+        );
+
+        document.getElementById("total").textContent = responses.length;
+        list.innerHTML = "";
+
+        if (responses.length === 0) {
+            list.innerHTML = "<p>No responses submitted yet.</p>";
+            return;
+        }
+
+        responses.forEach((r, i) => {
+            const item = document.createElement("div");
+            item.className = "response";
+
+            const heading = document.createElement("h3");
+            heading.textContent = "Response " + (i + 1);
+
+            const name = document.createElement("p");
+            name.textContent = "Name: " + r.name;
+
+            const answer = document.createElement("p");
+            answer.textContent = "Answer: " + r.answer;
+
+            const date = document.createElement("small");
+            date.textContent = "Submitted: " + r.date;
+
+            item.append(heading, name, answer, date);
+            list.appendChild(item);
+        });
+
+    } catch (error) {
+        list.innerHTML = "<p>Unable to load responses. Please check the backend.</p>";
+    }
+}
+
+async function clearResponses() {
+    if (confirm("Are you sure you want to delete all responses?")) {
+        try {
+            const result = await fetch("/api/clear", {
+                method: "POST"
+            });
+
+            if (!result.ok) {
+                throw new Error("Unable to clear responses");
+            }
+
+            alert("All responses cleared successfully!");
+            await showResponses();
+
+        } catch (error) {
+            alert("Unable to clear responses. Please check the backend.");
+        }
+    }
+}
+</script>
+</body>
+</html>
